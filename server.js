@@ -74,3 +74,7 @@ io.on("connection", socket => {
 server.listen(3000, () => {
   console.log("Serveur lancé sur http://localhost:3000");
 });
+
+app.get("/", (req, res) => {
+  res.sendFile(__dirname + "/public/index.html");
+});
