@@ -1,16 +1,37 @@
 let currentStream
 let usingFront = false
 
-const video = document.getElementById("video")
-const captureBtn = document.getElementById("captureBtn")
-const modal = document.getElementById("successModal")
+async function startCamera() {
 
-navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
-.then(stream=>{
-video.srcObject = stream
-})
+if(currentStream){
+currentStream.getTracks().forEach(track=>track.stop())
+}
 
-captureBtn.onclick = async ()=>{
+const constraints = {
+video: {
+facingMode: usingFront ? "user" : "environment"
+}
+}
+
+currentStream = await navigator.mediaDevices.getUserMedia(constraints)
+video.srcObject = currentStream
+}
+
+startCamera()
+
+document.getElementById("switchCam").onclick = () => {
+usingFront = !usingFront
+startCamera()
+}
+
+captureBtn.onclick = async () => {
+
+const prenom = document.getElementById("nameInput").value.trim()
+
+if(prenom === ""){
+alert("Veuillez entrer votre prénom")
+return
+}
 
 const canvas = document.createElement("canvas")
 canvas.width = video.videoWidth
@@ -22,7 +43,7 @@ const blob = await new Promise(res=>canvas.toBlob(res,"image/jpeg"))
 
 const form = new FormData()
 form.append("media",blob)
-form.append("prenom",document.getElementById("nameInput").value)
+form.append("prenom",prenom)
 
 await fetch("/upload",{ method:"POST", body:form })
 
@@ -36,7 +57,7 @@ modal.classList.remove("hidden")
 }
 
 function closeModal(){
-modal.classList.add("hidden")
+window.close()
 }
 
 function takeAnother(){
@@ -55,5 +76,23 @@ c.style.top="-10px"
 c.style.animation="fall 3s linear"
 document.body.appendChild(c)
 setTimeout(()=>c.remove(),3000)
+}
+}
+
+function openAdmin(){
+document.getElementById("adminModal").classList.remove("hidden")
+}
+
+function closeAdmin(){
+document.getElementById("adminModal").classList.add("hidden")
+}
+
+function checkAdmin(){
+const code=document.getElementById("adminCode").value
+
+if(code==="01081983"){
+window.location.href="/tv.html"
+}else{
+alert("Code incorrect")
 }
 }

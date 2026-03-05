@@ -17,7 +17,8 @@
 
 <div class="camera-container">
 <video id="video" autoplay playsinline></video>
-</div> class="controls">
+
+<div class="controls">
 
 <button id="switchCam" class="icon-btn">🔄</button>
 
@@ -25,6 +26,15 @@
 
 <button onclick="openAdmin()" class="admin-btn">ADMIN</button>
 
+</div>
+
+<div id="adminModal" class="modal hidden">
+<div class="modal-card">
+<h2>Code Admin</h2>
+<input type="password" id="adminCode">
+<button onclick="checkAdmin()">Valider</button>
+<button onclick="closeAdmin()">Annuler</button>
+</div>
 </div>
 
 <!-- SUCCESS MODAL -->
