@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="dark center-box">
+<h1>ADMIN PANEL</h1>
+
+<input type="datetime-local" id="date">
+<button onclick="setDate()">Modifier Reveal</button>
+
+<button onclick="toggleUploads()">Activer/Désactiver Uploads</button>
+
+<script>
+async function setDate(){
+  const date = document.getElementById("date").value;
+  await fetch("/admin/reveal-date",{
+    method:"POST",
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({date})
+  });
+  alert("Date modifiée");
+}
+
+async function toggleUploads(){
+  const res = await fetch("/admin/toggle-uploads",{method:"POST"});
+  const data = await res.json();
+  alert("Uploads: "+data.uploadsEnabled);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,82 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body.dark {
+  background: black;
+  color: white;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  overflow: hidden;
+}
+
+.camera-page {
+  position: relative;
+  height: 100vh;
+  width: 100vw;
+}
+
+video {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.camera-ui {
+  position: absolute;
+  bottom: 40px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+}
+
+#capture {
+  width: 85px;
+  height: 85px;
+  border-radius: 50%;
+  background: white;
+  border: 5px solid rgba(255,255,255,0.4);
+}
+
+#switchCam {
+  position: absolute;
+  right: 30px;
+  bottom: 10px;
+  background: rgba(255,255,255,0.2);
+  border: none;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  color: white;
+  font-size: 20px;
+}
+
+.permission {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+  background: rgba(0,0,0,0.8);
+  padding: 20px 30px;
+  border-radius: 20px;
+  text-align: center;
+}
+
+.permission button {
+  margin-top: 15px;
+  padding: 10px 20px;
+  border-radius: 20px;
+  border: none;
+}
+
+.flash::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: white;
+  opacity: 0.8;
+}

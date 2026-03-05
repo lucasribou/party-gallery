@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Private Event</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="dark">
+<div class="center-box">
+  <h1>PRIVATE EVENT</h1>
+  <input id="prenom" placeholder="Votre prénom">
+  <button onclick="login()">ENTRER</button>
+</div>
+
+<script>
+function login(){
+  const prenom = document.getElementById("prenom").value.trim();
+  if(!prenom) return;
+
+  localStorage.setItem("prenom", prenom);
+
+  if(prenom.toLowerCase() === "lucas"){
+    const code = prompt("Code requis :");
+    if(code === "200910"){
+      window.location = "choose.html";
+    } else {
+      alert("Code incorrect");
+    }
+  } else {
+    window.location = "photos.html";
+  }
+}
+</script>
+</body>
+</html>

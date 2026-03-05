@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Camera</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body class="dark camera-page">
+
+<video id="video" autoplay playsinline></video>
+
+<div class="camera-ui">
+  <button id="switchCam">🔄</button>
+  <button id="capture"></button>
+</div>
+
+<div id="permissionMessage" class="permission">
+  Autorisation caméra requise
+  <button onclick="initCamera()">Autoriser</button>
+</div>
+
+<script>
+let video = document.getElementById("video");
+let currentStream;
+let usingFront = false;
+const prenom = localStorage.getItem("prenom");
+
+async function initCamera() {
+  try {
+    if (currentStream) {
+      currentStream.getTracks().forEach(track => track.stop());
+    }
+
+    const constraints = {
+      video: {
+        facingMode: usingFront ? "user" : "environment"
+      },
+      audio: false
+    };
+
+    currentStream = await navigator.mediaDevices.getUserMedia(constraints);
+    video.srcObject = currentStream;
+
+    document.getElementById("permissionMessage").style.display = "none";
+
+  } catch (err) {
+    alert("Impossible d'accéder à la caméra. Vérifie les permissions.");
+    console.error(err);
+  }
+}
+
+document.getElementById("switchCam").onclick = () => {
+  usingFront = !usingFront;
+  initCamera();
+};
+
+document.getElementById("capture").onclick = async () => {
+  if (!currentStream) return;
+
+  const canvas = document.createElement("canvas");
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+
+  const ctx = canvas.getContext("2d");
+  ctx.drawImage(video, 0, 0);
+
+  const blob = await new Promise(res => canvas.toBlob(res, "image/jpeg", 0.9));
+
+  const formData = new FormData();
+  formData.append("media", blob);
+  formData.append("prenom", prenom);
+
+  await fetch("/upload", {
+    method: "POST",
+    body: formData
+  });
+
+  // animation flash
+  document.body.classList.add("flash");
+  setTimeout(() => document.body.classList.remove("flash"), 150);
+};
+
+// Demande auto permission au chargement
+initCamera();
+</script>
+
+</body>
+</html>
