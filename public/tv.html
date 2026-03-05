@@ -1,52 +1,144 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
-
 <meta charset="UTF-8">
-<title>Live Party</title>
-
-<link rel="stylesheet" href="/style.css">
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TV Reveal</title>
+<link rel="stylesheet" href="style.css">
 </head>
 
-<body>
+<body class="tv-body">
 
-<h1>Photos de la soirée</h1>
+<div class="tv-container">
 
-<div id="gallery"></div>
+<h1 id="modeText">REVEAL DANS</h1>
+<div id="countdown" class="tv-timer"></div>
+
+<div id="flash" class="flash"></div>
+
+<button class="tv-admin-btn" onclick="openAdmin()">ADMIN</button>
+
+</div>
+
+<!-- ADMIN PANEL -->
+<div id="adminPanel" class="modal hidden">
+<div class="modal-card">
+<h2>Paramètres Reveal</h2>
+
+<label>Date du reveal :</label>
+<input type="datetime-local" id="revealDateInput">
+
+<br><br>
+
+<button onclick="saveReveal()">Sauvegarder</button>
+<button onclick="closeAdmin()">Fermer</button>
+
+</div>
+</div>
 
 <script>
+let revealDate = localStorage.getItem("revealDate")
 
-async function loadPhotos(){
+if(!revealDate){
+  revealDate = new Date().getTime() + 3600000
+  localStorage.setItem("revealDate", revealDate)
+}
 
-const res = await fetch("/photos")
+function updateTimer(){
 
-const photos = await res.json()
+const now = new Date().getTime()
+const distance = revealDate - now
 
-const g = document.getElementById("gallery")
+const countdown = document.getElementById("countdown")
+const modeText = document.getElementById("modeText")
 
-g.innerHTML=""
+// 5 dernières minutes = seulement reveal
+if(distance <= 300000){
+  modeText.innerText = "REVEAL FINAL"
+} else {
+  // alternance 40s / 20s
+  const cycle = Math.floor((now / 1000) % 60)
+  if(cycle < 40){
+    modeText.innerText = "REVEAL DANS"
+  } else {
+    modeText.innerText = "CLASSEMENT"
+  }
+}
 
-photos.forEach(p=>{
+// affichage temps restant
+if(distance <= 0){
+  countdown.innerText = "🎉 REVEAL 🎉"
+  return
+}
 
-const img=document.createElement("img")
+const hours = Math.floor(distance / (1000*60*60))
+const minutes = Math.floor((distance % (1000*60*60)) / (1000*60))
+const seconds = Math.floor((distance % (1000*60)) / 1000)
 
-img.src=p.url
+countdown.innerText =
+String(hours).padStart(2,'0') + "h " +
+String(minutes).padStart(2,'0') + "m " +
+String(seconds).padStart(2,'0') + "s"
 
-img.style.width="200px"
-
-img.style.margin="10px"
-
-g.appendChild(img)
-
-})
+// BIPS VISUELS
+handleBips(distance)
 
 }
 
-setInterval(loadPhotos,5000)
+function handleBips(distance){
 
-loadPhotos()
+const flash = document.getElementById("flash")
 
+flash.style.background="transparent"
+
+if(distance <= 60000 && distance > 10000){
+  if(distance % 30000 < 1000){
+    flashEffect()
+  }
+}
+
+if(distance <= 10000 && distance > 0){
+  if(distance % 10000 < 1000){
+    flashEffect()
+  }
+}
+
+if(distance <= 10000){
+  if(distance % 1000 < 200){
+    flashEffect()
+  }
+}
+
+}
+
+function flashEffect(){
+const flash = document.getElementById("flash")
+flash.style.background="red"
+setTimeout(()=>flash.style.background="transparent",200)
+}
+
+setInterval(updateTimer,1000)
+updateTimer()
+
+// ADMIN
+
+function openAdmin(){
+document.getElementById("adminPanel").classList.remove("hidden")
+}
+
+function closeAdmin(){
+document.getElementById("adminPanel").classList.add("hidden")
+}
+
+function saveReveal(){
+const date = document.getElementById("revealDateInput").value
+if(date){
+localStorage.setItem("revealDate", new Date(date).getTime())
+alert("Date sauvegardée")
+closeAdmin()
+location.reload()
+}
+}
 </script>
 
 </body>
