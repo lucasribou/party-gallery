@@ -6,9 +6,6 @@ const video = document.getElementById("video")
 const captureBtn = document.getElementById("captureBtn")
 const switchCamBtn = document.getElementById("switchCam")
 const modal = document.getElementById("successModal")
-const multer = require("multer")
-const fs = require("fs")
-const path = require("path")
 
 let currentStream
 let usingFront = false
