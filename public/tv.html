@@ -1,65 +1,53 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<link rel="stylesheet" href="style.css">
-<script src="/socket.io/socket.io.js"></script>
-</head>
-<body class="dark tv">
 
-<div id="timerBox"></div>
-<div id="classementBox" style="display:none;"></div>
+<meta charset="UTF-8">
+<title>Live Party</title>
+
+<link rel="stylesheet" href="/style.css">
+
+</head>
+
+<body>
+
+<h1>Photos de la soirée</h1>
+
+<div id="gallery"></div>
 
 <script>
-const socket = io();
-let revealDate;
 
-async function getReveal(){
-  const res = await fetch("/reveal-date");
-  const data = await res.json();
-  revealDate = new Date(data.revealDate);
-}
-getReveal();
+async function loadPhotos(){
 
-function updateTimer(){
-  const now = new Date();
-  const diff = revealDate - now;
-  if(diff <= 0){
-    document.body.innerHTML = "<h1>REVEAL</h1>";
-    return;
-  }
-  const h = Math.floor(diff/3600000);
-  const m = Math.floor((diff%3600000)/60000);
-  const s = Math.floor((diff%60000)/1000);
-  document.getElementById("timerBox").innerHTML =
-  `<h1>REVEAL DANS</h1><div class="big">${h}h ${m}m ${s}s</div>`;
-}
+const res = await fetch("/photos")
 
-async function updateClassement(){
-  const res = await fetch("/stats");
-  const stats = await res.json();
-  const sorted = Object.entries(stats).sort((a,b)=>b[1]-a[1]);
-  let html = "<h1>CLASSEMENT</h1>";
-  sorted.forEach(([name,count],i)=>{
-    html += `<div>${i+1}. ${name} — ${count}</div>`;
-  });
-  document.getElementById("classementBox").innerHTML = html;
+const photos = await res.json()
+
+const g = document.getElementById("gallery")
+
+g.innerHTML=""
+
+photos.forEach(p=>{
+
+const img=document.createElement("img")
+
+img.src=p.url
+
+img.style.width="200px"
+
+img.style.margin="10px"
+
+g.appendChild(img)
+
+})
+
 }
 
-setInterval(updateTimer,1000);
+setInterval(loadPhotos,5000)
 
-setInterval(()=>{
-  document.getElementById("timerBox").style.display="block";
-  document.getElementById("classementBox").style.display="none";
-},60000);
+loadPhotos()
 
-setInterval(()=>{
-  updateClassement();
-  document.getElementById("timerBox").style.display="none";
-  document.getElementById("classementBox").style.display="block";
-},60000+40000);
-
-socket.on("update", updateClassement);
 </script>
+
 </body>
 </html>
