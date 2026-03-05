@@ -22,15 +22,15 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
 // ==========================
-// DOSSIER UPLOADS
+// DOSSIERS
 // ==========================
 
-const baseUploadDir = path.join(__dirname, "uploads");
-const picturesDir = path.join(baseUploadDir, "pictures");
+const baseDir = path.join(__dirname, "uploads");
+const picturesDir = path.join(baseDir, "pictures");
 
-// Créer dossiers si ils n'existent pas
-if (!fs.existsSync(baseUploadDir)) {
-  fs.mkdirSync(baseUploadDir);
+// Création automatique des dossiers
+if (!fs.existsSync(baseDir)) {
+  fs.mkdirSync(baseDir);
 }
 
 if (!fs.existsSync(picturesDir)) {
@@ -74,59 +74,96 @@ let revealDate = new Date(Date.now() + 3600000); // +1h par défaut
 let uploadsEnabled = true;
 
 // ==========================
-// ROUTE UPLOAD
+// ROUTES
 // ==========================
 
+// Upload photo
 app.post("/upload", upload.single("media"), (req, res) => {
-
   if (!uploadsEnabled) {
     return res.status(403).json({ error: "Uploads désactivés" });
   }
 
   res.json({ success: true });
-
 });
 
-app.get("/stats", (req, res) => {
-  const files = fs.readdirSync(uploadDir);
-  const stats = {};
-
-  files.forEach(file => {
-    const prenom = file.split("_")[0];
-    stats[prenom] = (stats[prenom] || 0) + 1;
-  });
-
-  res.json(stats);
-});
-
+// Récupérer la date du reveal
 app.get("/reveal-date", (req, res) => {
   res.json({ revealDate });
 });
 
+// Modifier la date (ADMIN)
 app.post("/admin/reveal-date", (req, res) => {
+  if (!req.body.date) return res.sendStatus(400);
+
   revealDate = new Date(req.body.date);
+
   io.emit("update");
+
   res.sendStatus(200);
 });
 
+// Activer / désactiver uploads
 app.post("/admin/toggle-uploads", (req, res) => {
   uploadsEnabled = !uploadsEnabled;
   res.json({ uploadsEnabled });
 });
 
-app.get("/all-photos", (req, res) => {
-  const files = fs.readdirSync(uploadDir);
-  res.json(files);
+// Stats (nombre de photos par personne)
+app.get("/stats", (req, res) => {
+
+  const stats = {};
+
+  if (!fs.existsSync(picturesDir)) {
+    return res.json(stats);
+  }
+
+  const users = fs.readdirSync(picturesDir);
+
+  users.forEach(user => {
+    const userPath = path.join(picturesDir, user);
+
+    if (fs.statSync(userPath).isDirectory()) {
+      const files = fs.readdirSync(userPath);
+      stats[user] = files.length;
+    }
+  });
+
+  res.json(stats);
 });
 
-io.on("connection", socket => {
+// Toutes les photos
+app.get("/all-photos", (req, res) => {
+
+  const result = {};
+
+  if (!fs.existsSync(picturesDir)) {
+    return res.json(result);
+  }
+
+  const users = fs.readdirSync(picturesDir);
+
+  users.forEach(user => {
+    const userPath = path.join(picturesDir, user);
+
+    if (fs.statSync(userPath).isDirectory()) {
+      result[user] = fs.readdirSync(userPath);
+    }
+  });
+
+  res.json(result);
+});
+
+// Socket.io
+io.on("connection", (socket) => {
   console.log("Client connecté");
 });
 
-server.listen(3000, () => {
-  console.log("Serveur lancé sur http://localhost:3000");
-});
+// ==========================
+// PORT (IMPORTANT POUR RENDER)
+// ==========================
 
-app.get("/", (req, res) => {
-  res.sendFile(__dirname + "/public/index.html");
+const PORT = process.env.PORT || 3000;
+
+server.listen(PORT, () => {
+  console.log("Serveur lancé sur le port " + PORT);
 });
