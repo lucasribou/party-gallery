@@ -1,3 +1,6 @@
+let currentStream
+let usingFront = false
+
 const video = document.getElementById("video")
 const captureBtn = document.getElementById("captureBtn")
 const modal = document.getElementById("successModal")

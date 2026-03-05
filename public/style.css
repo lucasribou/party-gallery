@@ -118,3 +118,42 @@ to{
 transform:translateY(110vh) rotate(720deg);
 }
 }
+
+.white-btn{
+width:90px;
+height:90px;
+border-radius:50%;
+background:white;
+border:6px solid rgba(255,255,255,0.4);
+cursor:pointer;
+}
+
+.icon-btn{
+background:rgba(255,255,255,0.2);
+border:none;
+color:white;
+padding:12px;
+border-radius:50%;
+font-size:18px;
+}
+
+.admin-btn{
+position:absolute;
+top:20px;
+right:20px;
+background:rgba(255,255,255,0.15);
+color:white;
+border:none;
+padding:10px 15px;
+border-radius:12px;
+}
+
+.controls{
+position:absolute;
+bottom:40px;
+width:100%;
+display:flex;
+justify-content:center;
+align-items:center;
+gap:30px;
+}
