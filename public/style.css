@@ -80,3 +80,74 @@ video {
   background: white;
   opacity: 0.8;
 }
+
+.success-screen{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:linear-gradient(135deg,#f5f7fa,#e4e9f2);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-family:Arial, sans-serif;
+}
+
+.hidden{
+  display:none;
+}
+
+.success-card{
+  background:white;
+  padding:40px;
+  border-radius:20px;
+  text-align:center;
+  box-shadow:0 15px 40px rgba(0,0,0,0.15);
+  max-width:350px;
+  width:85%;
+}
+
+.checkmark{
+  font-size:70px;
+  color:#2ecc71;
+  margin-bottom:15px;
+}
+
+.success-card h2{
+  font-size:28px;
+  margin-bottom:10px;
+}
+
+.success-card p{
+  color:#666;
+  margin-bottom:30px;
+}
+
+.buttons{
+  display:flex;
+  flex-direction:column;
+  gap:15px;
+}
+
+.buttons button{
+  padding:14px;
+  font-size:16px;
+  border:none;
+  border-radius:12px;
+  cursor:pointer;
+  transition:all 0.2s;
+}
+
+.buttons button:first-child{
+  background:#4CAF50;
+  color:white;
+}
+
+.buttons button:last-child{
+  background:#eaeaea;
+}
+
+.buttons button:hover{
+  transform:scale(1.05);
+}
