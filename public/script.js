@@ -42,7 +42,16 @@ confetti()
 }
 
 function restart(){
-location.reload()
+
+// cacher l'écran succès
+document.getElementById("successScreen").classList.add("hidden")
+
+// relancer la caméra si besoin
+navigator.mediaDevices.getUserMedia({video:true})
+.then(stream=>{
+video.srcObject = stream
+})
+
 }
 
 function leave(){
