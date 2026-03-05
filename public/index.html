@@ -1,56 +1,46 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Party Gallery</title>
-
-<link rel="stylesheet" href="/style.css">
-
+<link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<div class="container">
+<div class="hero">
 
-<h1 class="title">📸 Party Gallery</h1>
+<h1 class="logo">✨ PARTY GALLERY</h1>
 
-<input id="nameInput" placeholder="Votre prénom">
+<p class="subtitle">Scannez le QR Code pour participer</p>
 
-<div class="camera">
+<input id="nameInput" placeholder="Entrez votre prénom">
 
+<div class="camera-container">
 <video id="video" autoplay playsinline></video>
+</div>
 
-<canvas id="canvas"></canvas>
+<button id="captureBtn" class="capture-btn">📸 PRENDRE UNE PHOTO</button>
 
 </div>
 
-<button id="captureBtn">Prendre la photo</button>
-
-</div>
-
-<div id="successScreen" class="hidden">
-
-<div class="card">
-
+<!-- SUCCESS MODAL -->
+<div id="successModal" class="modal hidden">
+<div class="modal-card">
 <div class="check">✔</div>
-
 <h2>Photo envoyée !</h2>
+<p>Merci pour votre participation 🎉</p>
 
-<p>Merci pour votre participation</p>
-
-<button onclick="restart()">📸 En reprendre une</button>
-
-<button onclick="leave()">Quitter</button>
-
+<div class="modal-buttons">
+<button onclick="takeAnother()">📸 En reprendre une</button>
+<button onclick="closeModal()">🚪 Quitter</button>
 </div>
 
 </div>
+</div>
 
-<script src="/confetti.js"></script>
-<script src="/script.js"></script>
+<script src="app.js"></script>
 
 </body>
 </html>
