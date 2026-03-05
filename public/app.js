@@ -1,98 +1,155 @@
+// ==========================
+// ELEMENTS
+// ==========================
+
+const video = document.getElementById("video")
+const captureBtn = document.getElementById("captureBtn")
+const switchCamBtn = document.getElementById("switchCam")
+const modal = document.getElementById("successModal")
+
 let currentStream
 let usingFront = false
 
+// ==========================
+// CAMERA
+// ==========================
+
 async function startCamera() {
 
-if(currentStream){
-currentStream.getTracks().forEach(track=>track.stop())
-}
+  if (currentStream) {
+    currentStream.getTracks().forEach(track => track.stop())
+  }
 
-const constraints = {
-video: {
-facingMode: usingFront ? "user" : "environment"
-}
-}
+  const constraints = {
+    video: {
+      facingMode: usingFront ? "user" : "environment"
+    }
+  }
 
-currentStream = await navigator.mediaDevices.getUserMedia(constraints)
-video.srcObject = currentStream
+  try {
+    currentStream = await navigator.mediaDevices.getUserMedia(constraints)
+    video.srcObject = currentStream
+  } catch (err) {
+    alert("Impossible d'accéder à la caméra")
+    console.error(err)
+  }
 }
 
 startCamera()
 
-document.getElementById("switchCam").onclick = () => {
-usingFront = !usingFront
-startCamera()
+// ==========================
+// CHANGER CAMERA
+// ==========================
+
+if (switchCamBtn) {
+  switchCamBtn.onclick = () => {
+    usingFront = !usingFront
+    startCamera()
+  }
 }
 
-captureBtn.onclick = async () => {
+// ==========================
+// PRENDRE PHOTO
+// ==========================
 
-const prenom = document.getElementById("nameInput").value.trim()
+if (captureBtn) {
+  captureBtn.onclick = async () => {
 
-if(prenom === ""){
-alert("Veuillez entrer votre prénom")
-return
+    const prenom = document.getElementById("nameInput").value.trim()
+
+    if (prenom === "") {
+      alert("Veuillez entrer votre prénom")
+      return
+    }
+
+    const canvas = document.createElement("canvas")
+    canvas.width = video.videoWidth
+    canvas.height = video.videoHeight
+
+    const ctx = canvas.getContext("2d")
+    ctx.drawImage(video, 0, 0)
+
+    const blob = await new Promise(resolve =>
+      canvas.toBlob(resolve, "image/jpeg", 0.9)
+    )
+
+    const form = new FormData()
+    form.append("media", blob)
+    form.append("prenom", prenom)
+
+    await fetch("/upload", {
+      method: "POST",
+      body: form
+    })
+
+    showModal()
+    launchConfetti()
+  }
 }
 
-const canvas = document.createElement("canvas")
-canvas.width = video.videoWidth
-canvas.height = video.videoHeight
+// ==========================
+// MODAL
+// ==========================
 
-canvas.getContext("2d").drawImage(video,0,0)
-
-const blob = await new Promise(res=>canvas.toBlob(res,"image/jpeg"))
-
-const form = new FormData()
-form.append("media",blob)
-form.append("prenom",prenom)
-
-await fetch("/upload",{ method:"POST", body:form })
-
-showModal()
-launchConfetti()
-
+function showModal() {
+  if (modal) {
+    modal.classList.remove("hidden")
+  }
 }
 
-function showModal(){
-modal.classList.remove("hidden")
+function closeModal() {
+  if (modal) {
+    modal.classList.add("hidden")
+  }
 }
 
-function closeModal(){
-window.close()
+function takeAnother() {
+  closeModal()
 }
 
-function takeAnother(){
-modal.classList.add("hidden")
+// ==========================
+// CONFETTIS
+// ==========================
+
+function launchConfetti() {
+  for (let i = 0; i < 100; i++) {
+    const c = document.createElement("div")
+    c.style.position = "fixed"
+    c.style.width = "8px"
+    c.style.height = "8px"
+    c.style.background = "hsl(" + Math.random() * 360 + ",70%,60%)"
+    c.style.left = Math.random() * 100 + "vw"
+    c.style.top = "-10px"
+    c.style.animation = "fall 3s linear"
+    document.body.appendChild(c)
+    setTimeout(() => c.remove(), 3000)
+  }
 }
 
-function launchConfetti(){
-for(let i=0;i<100;i++){
-const c=document.createElement("div")
-c.style.position="fixed"
-c.style.width="8px"
-c.style.height="8px"
-c.style.background="hsl("+Math.random()*360+",70%,60%)"
-c.style.left=Math.random()*100+"vw"
-c.style.top="-10px"
-c.style.animation="fall 3s linear"
-document.body.appendChild(c)
-setTimeout(()=>c.remove(),3000)
-}
+// ==========================
+// ADMIN
+// ==========================
+
+function openAdmin() {
+  const adminModal = document.getElementById("adminModal")
+  if (adminModal) {
+    adminModal.classList.remove("hidden")
+  }
 }
 
-function openAdmin(){
-document.getElementById("adminModal").classList.remove("hidden")
+function closeAdmin() {
+  const adminModal = document.getElementById("adminModal")
+  if (adminModal) {
+    adminModal.classList.add("hidden")
+  }
 }
 
-function closeAdmin(){
-document.getElementById("adminModal").classList.add("hidden")
-}
+function checkAdmin() {
+  const code = document.getElementById("adminCode").value
 
-function checkAdmin(){
-const code=document.getElementById("adminCode").value
-
-if(code==="01081983"){
-window.location.href="/tv.html"
-}else{
-alert("Code incorrect")
-}
+  if (code === "01081983") {
+    window.location.href = "/tv.html"
+  } else {
+    alert("Code incorrect")
+  }
 }
