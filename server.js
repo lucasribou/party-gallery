@@ -1,13 +1,19 @@
-// ==========================
-// IMPORTS
-// ==========================
-
 const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
 const multer = require("multer");
-const path = require("path");
-const fs = require("fs");
+const cloudinary = require("cloudinary").v2;
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
+
+// ==========================
+// CLOUDINARY CONFIG
+// ==========================
+
+cloudinary.config({
+  cloud_name: "dsjd9vqnu",
+  api_key: "289571173988713",
+  api_secret: "TON_API_SECRET_ICI"
+});
 
 // ==========================
 // APP SETUP
@@ -22,63 +28,32 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
 // ==========================
-// DOSSIERS
+// MULTER + CLOUDINARY
 // ==========================
 
-const baseDir = path.join(__dirname, "uploads");
-const picturesDir = path.join(baseDir, "pictures");
-
-// Création automatique des dossiers
-if (!fs.existsSync(baseDir)) {
-  fs.mkdirSync(baseDir);
-}
-
-if (!fs.existsSync(picturesDir)) {
-  fs.mkdirSync(picturesDir);
-}
-
-// ==========================
-// CONFIG MULTER
-// ==========================
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-
-    const prenom = (req.body.prenom || "unknown")
-      .toLowerCase()
-      .trim()
-      .replace(/[^a-z0-9]/g, "");
-
-    const userDir = path.join(picturesDir, prenom);
-
-    if (!fs.existsSync(userDir)) {
-      fs.mkdirSync(userDir, { recursive: true });
-    }
-
-    cb(null, userDir);
-  },
-
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    cb(null, Date.now() + ext);
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: "party-gallery",
+    allowed_formats: ["jpg", "png", "jpeg"]
   }
 });
 
 const upload = multer({ storage });
 
 // ==========================
-// VARIABLES GLOBALES
+// VARIABLES
 // ==========================
 
-let revealDate = new Date(Date.now() + 3600000); // +1h par défaut
+let revealDate = new Date(Date.now() + 3600000);
 let uploadsEnabled = true;
 
 // ==========================
-// ROUTES
+// ROUTE UPLOAD
 // ==========================
 
-// Upload photo
 app.post("/upload", upload.single("media"), (req, res) => {
+
   if (!uploadsEnabled) {
     return res.status(403).json({ error: "Uploads désactivés" });
   }
@@ -86,7 +61,6 @@ app.post("/upload", upload.single("media"), (req, res) => {
   res.json({ success: true });
 });
 
-// Récupérer la date du reveal
 app.get("/reveal-date", (req, res) => {
   res.json({ revealDate });
 });
