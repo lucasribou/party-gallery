@@ -36,6 +36,7 @@ font-size:16px;
 }
 
 .camera-container{
+position:relative;
 border-radius:20px;
 overflow:hidden;
 box-shadow:0 20px 50px rgba(0,0,0,0.6);
@@ -120,21 +121,30 @@ transform:translateY(110vh) rotate(720deg);
 }
 
 .white-btn{
-width:90px;
-height:90px;
+position:absolute;
+bottom:20px;
+left:50%;
+transform:translateX(-50%);
+width:80px;
+height:80px;
 border-radius:50%;
 background:white;
 border:6px solid rgba(255,255,255,0.4);
 cursor:pointer;
+z-index:10;
 }
 
 .icon-btn{
+position:absolute;
+bottom:20px;
+left:20px;
 background:rgba(255,255,255,0.2);
 border:none;
 color:white;
 padding:12px;
 border-radius:50%;
 font-size:18px;
+z-index:10;
 }
 
 .admin-btn{
@@ -195,4 +205,16 @@ right:20px;
 padding:10px 15px;
 border:none;
 border-radius:10px;
+}
+
+.admin-btn{
+position:fixed;
+top:20px;
+left:20px;
+background:rgba(255,255,255,0.15);
+color:white;
+border:none;
+padding:10px 15px;
+border-radius:12px;
+z-index:1000;
 }
